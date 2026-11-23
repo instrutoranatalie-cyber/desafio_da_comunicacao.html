@@ -1,0 +1,933 @@
+<!--
+DESAFIO DA COMUNICAÇÃO
+Jogo educativo (Verdadeiro/Falso) sobre comunicação oral (fala) x comunicação escrita.
+Arquivo único: desafio_da_comunicacao.html
+-->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>DESAFIO DA COMUNICAÇÃO</title>
+  <style>
+    :root{
+      --bg1:#f6f7ff;
+      --bg2:#eef2ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#5b6b86;
+      --purple:#6d28d9;
+      --purple2:#7c3aed;
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --good:#16a34a;
+      --bad:#ef4444;
+      --shadow: 0 12px 30px rgba(29,78,216,.10);
+      --shadow2: 0 8px 18px rgba(109,40,217,.12);
+      --ring: rgba(109,40,217,.25);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(124,58,237,.14), transparent 60%),
+        radial-gradient(800px 500px at 85% 15%, rgba(37,99,235,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px 14px 26px;
+    }
+
+    .app{
+      width: min(980px, 100%);
+      margin: 0 auto;
+      display:grid;
+      gap:14px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding: 14px 14px 2px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 0;
+    }
+
+    .title{
+      font-weight: 900;
+      letter-spacing:.4px;
+      font-size: clamp(20px, 3.4vw, 28px);
+      line-height:1.15;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size: clamp(13px, 2.2vw, 15px);
+      line-height:1.35;
+    }
+
+    .hud{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(109,40,217,.14);
+      box-shadow: 0 10px 25px rgba(109,40,217,.07);
+      border-radius: 999px;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height: 42px;
+    }
+
+    .pill .label{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing:.5px;
+      white-space:nowrap;
+    }
+
+    .pill .value{
+      font-weight: 900;
+      font-size: 15px;
+      white-space:nowrap;
+    }
+
+    .mainCard{
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(109,40,217,.14);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .inner{
+      padding: 16px;
+    }
+
+    .progressWrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(109,40,217,.12);
+      background: linear-gradient(180deg, rgba(124,58,237,.06), rgba(37,99,235,.03));
+    }
+
+    .progressMeta{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width: 120px;
+    }
+    .progressMeta .kicker{
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.55px;
+    }
+    .progressMeta .percent{
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .bar{
+      height: 12px;
+      background: rgba(37,99,235,.10);
+      border-radius: 999px;
+      overflow:hidden;
+      flex: 1;
+      border: 1px solid rgba(37,99,235,.15);
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--purple2), var(--blue));
+      border-radius: 999px;
+      transition: width .35s ease;
+      box-shadow: 0 10px 20px rgba(109,40,217,.25);
+    }
+
+    .questionArea{
+      padding: 16px;
+      display:grid;
+      gap: 14px;
+    }
+
+    .qTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .qNumber{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .qNumber .n{
+      font-weight: 1000;
+      font-size: 14px;
+      color: var(--muted);
+      letter-spacing:.55px;
+      text-transform:uppercase;
+    }
+    .qNumber .step{
+      font-weight: 950;
+      font-size: 18px;
+      line-height:1.1;
+    }
+
+    .feedback{
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(109,40,217,.14);
+      box-shadow: 0 12px 25px rgba(29,78,216,.05);
+      display:none;
+    }
+    .feedback.show{ display:block; }
+    .feedback.good{
+      border-color: rgba(22,163,74,.25);
+      background: rgba(22,163,74,.08);
+    }
+    .feedback.bad{
+      border-color: rgba(239,68,68,.25);
+      background: rgba(239,68,68,.08);
+    }
+    .feedback .head{
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:6px;
+    }
+    .badge{
+      width: 34px; height:34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      font-weight: 1000;
+      box-shadow: var(--shadow2);
+      border: 1px solid rgba(0,0,0,.04);
+    }
+    .feedback.good .badge{
+      background: rgba(22,163,74,.14);
+      color: var(--good);
+    }
+    .feedback.bad .badge{
+      background: rgba(239,68,68,.14);
+      color: var(--bad);
+    }
+    .feedback .head .txt{
+      font-weight: 950;
+      font-size: 14px;
+    }
+    .feedback p{
+      margin:0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height:1.45;
+    }
+    .feedback .correctLine{
+      margin-top:8px;
+      font-weight: 900;
+      color: var(--text);
+      font-size: 13.5px;
+    }
+    .feedback .correctLine span{
+      color: var(--purple);
+    }
+
+    .questionCard{
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(109,40,217,.16);
+      border-radius: 16px;
+      padding: 14px 14px;
+      box-shadow: 0 10px 24px rgba(109,40,217,.06);
+    }
+
+    .question{
+      font-weight: 900;
+      font-size: clamp(15px, 2.5vw, 18px);
+      line-height: 1.35;
+      margin:0;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius: 16px;
+      padding: 15px 12px;
+      font-weight: 1000;
+      font-size: clamp(15px, 2.5vw, 18px);
+      cursor:pointer;
+      transition: transform .06s ease, filter .2s ease, opacity .2s ease, box-shadow .2s ease;
+      box-shadow: 0 12px 26px rgba(29,78,216,.12);
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 56px;
+    }
+
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    .btnTrue{
+      background: linear-gradient(180deg, rgba(37,99,235,.12), rgba(37,99,235,.06)), rgba(255,255,255,.9);
+      border: 1px solid rgba(37,99,235,.22);
+      color: var(--blue2);
+    }
+    .btnFalse{
+      background: linear-gradient(180deg, rgba(109,40,217,.12), rgba(109,40,217,.06)), rgba(255,255,255,.9);
+      border: 1px solid rgba(109,40,217,.25);
+      color: var(--purple);
+    }
+
+    .btn::after{
+      content:"";
+      position:absolute;
+      inset:-40% -20% auto -20%;
+      height: 130%;
+      transform: rotate(12deg) translateX(-140%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+      transition: transform .65s ease;
+      pointer-events:none;
+    }
+    .btn:hover::after{ transform: rotate(12deg) translateX(160%); }
+
+    .btn[disabled]{
+      cursor:not-allowed;
+      opacity:.7;
+      filter:saturate(.85);
+      box-shadow:none;
+    }
+
+    .bottomArea{
+      padding: 0 16px 16px;
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .hint{
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(109,40,217,.25);
+      background: rgba(255,255,255,.65);
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .nextBtn{
+      padding: 14px 16px;
+      background: linear-gradient(180deg, rgba(124,58,237,.95), rgba(37,99,235,.95));
+      color:white;
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 18px 35px rgba(37,99,235,.25);
+      border-radius: 16px;
+      font-weight: 1000;
+      font-size: 16px;
+      cursor:pointer;
+      transition: transform .06s ease, filter .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 54px;
+    }
+    .nextBtn:active{ transform: translateY(1px) scale(.99); }
+    .nextBtn:disabled{
+      cursor:not-allowed;
+      opacity:.55;
+      box-shadow:none;
+      filter:saturate(.8);
+    }
+
+    .footerRow{
+      padding: 0 16px 16px;
+      display:grid;
+      gap:12px;
+    }
+
+    .startCard{
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+
+    .startTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+
+    .startText p{
+      margin:0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height:1.5;
+      font-size: 14px;
+    }
+
+    .startList{
+      margin:0;
+      padding-left:18px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height:1.6;
+      font-size: 14px;
+    }
+
+    .primary{
+      background: linear-gradient(180deg, rgba(124,58,237,.95), rgba(37,99,235,.95));
+      border: 1px solid rgba(255,255,255,.25);
+      color:white;
+      box-shadow: 0 18px 35px rgba(37,99,235,.25);
+    }
+
+    .hide{ display:none !important; }
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(2,6,23,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px 14px;
+      z-index: 50;
+    }
+    .modalOverlay.show{ display:flex; }
+    .modal{
+      width: min(680px, 100%);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 20px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px 16px;
+      background: linear-gradient(90deg, rgba(124,58,237,.18), rgba(37,99,235,.10));
+      border-bottom: 1px solid rgba(109,40,217,.14);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .modalHeader .h{
+      font-weight: 1000;
+      font-size: 16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .modalBody{
+      padding: 16px;
+      display:grid;
+      gap: 12px;
+    }
+    .bigScore{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .scoreBox{
+      background: rgba(255,255,255,.8);
+      border: 1px solid rgba(109,40,217,.16);
+      border-radius: 18px;
+      padding: 12px 14px;
+      flex:1;
+      min-width: 220px;
+    }
+    .scoreBox .k{ color: var(--muted); font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.55px; }
+    .scoreBox .v{ font-size: 34px; font-weight: 1100; margin-top:4px; color: var(--purple); }
+    .resultMsg{
+      background: rgba(124,58,237,.08);
+      border: 1px solid rgba(124,58,237,.20);
+      border-radius: 18px;
+      padding: 12px 14px;
+      flex:1;
+      min-width: 220px;
+    }
+    .resultMsg .m{
+      margin:0;
+      font-weight: 950;
+      font-size: 16px;
+      line-height:1.35;
+    }
+    .resultMsg .s{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 14px;
+      line-height:1.4;
+    }
+
+    .modalActions{
+      padding: 0 16px 16px;
+      display:flex;
+      gap:12px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .ghost{
+      background: rgba(255,255,255,.8);
+      border: 1px solid rgba(109,40,217,.18);
+      color: var(--purple);
+      box-shadow:none;
+    }
+
+    /* Animations */
+    @keyframes popGood{
+      0%{ transform: scale(.98); }
+      60%{ transform: scale(1.01); }
+      100%{ transform: scale(1); }
+    }
+    @keyframes popBad{
+      0%{ transform: scale(.98); }
+      60%{ transform: scale(1.01); }
+      100%{ transform: scale(1); }
+    }
+    .feedback.good.show{ animation: popGood .25s ease; }
+    .feedback.bad.show{ animation: popBad .25s ease; }
+
+    /* Mobile tweaks */
+    @media (max-width: 520px){
+      header{ padding-left: 6px; padding-right: 6px; }
+      .inner{ padding: 12px; }
+      .progressWrap{ padding-left: 12px; padding-right: 12px; }
+      .questionArea{ padding: 12px; }
+      .bottomArea{ padding-left: 12px; padding-right: 12px; }
+      .answers{ gap: 10px; }
+      .btn{ min-height: 54px; border-radius: 16px; }
+      .hint{ min-width: 160px; }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .bar > i, .btn::after { transition: none !important; }
+      .feedback.good.show, .feedback.bad.show { animation: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" role="application" aria-label="Jogo educativo DESAFIO DA COMUNICAÇÃO">
+    <header>
+      <div class="brand">
+        <div class="title">DESAFIO DA COMUNICAÇÃO</div>
+        <div class="subtitle">🗣️ Comunicação oral (fala) x ✍️ comunicação escrita — responda Verdadeiro ou Falso.</div>
+      </div>
+
+      <div class="hud" aria-label="Painel do jogo">
+        <div class="pill" title="Perguntas respondidas">
+          <div>
+            <div class="label">Progresso</div>
+            <div class="value" id="hudProgress">0/15</div>
+          </div>
+        </div>
+        <div class="pill" title="Pontuação acumulada">
+          <div>
+            <div class="label">Pontos</div>
+            <div class="value" id="hudScore">0</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="mainCard" aria-label="Área principal do quiz">
+      <div class="progressWrap">
+        <div class="progressMeta">
+          <div class="kicker">Progresso</div>
+          <div class="percent" id="progressText">0%</div>
+        </div>
+        <div class="bar" aria-hidden="true">
+          <i id="progressBar"></i>
+        </div>
+      </div>
+
+      <!-- Tela inicial (sem depender de professor) -->
+      <div class="startCard inner" id="startScreen">
+        <div class="startTop">
+          <div class="startText">
+            <p><strong>Bem-vindo(a)!</strong> Você vai responder <strong>15 afirmações</strong> sobre comunicação oral e escrita.</p>
+            <p>Escolha uma opção (Verdadeiro ou Falso). O jogo mostra na hora se você acertou e explica o conceito.</p>
+          </div>
+        </div>
+
+        <ul class="startList">
+          <li>✅ Cada resposta correta vale <strong>1 ponto</strong>.</li>
+          <li>🔒 Depois de escolher, você <strong>não consegue alterar</strong>.</li>
+          <li>➡️ Avance para a próxima pergunta com o botão.</li>
+        </ul>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; margin-top:6px;">
+          <button class="nextBtn primary" id="startBtn" type="button">🚀 Começar</button>
+        </div>
+      </div>
+
+      <!-- Tela do quiz -->
+      <div class="questionArea hide" id="gameScreen" aria-live="polite">
+        <div class="qTop">
+          <div class="qNumber">
+            <div class="n" id="qIndexLabel">Pergunta</div>
+            <div class="step" id="qIndex">1 / 15</div>
+          </div>
+          <div class="feedback" id="feedbackBox" aria-live="assertive"></div>
+        </div>
+
+        <div class="questionCard">
+          <p class="question" id="questionText">...</p>
+        </div>
+
+        <div class="answers" role="group" aria-label="Escolha a resposta">
+          <button class="btn btnTrue" id="trueBtn" type="button">VERDADEIRO</button>
+          <button class="btn btnFalse" id="falseBtn" type="button">FALSO</button>
+        </div>
+      </div>
+
+      <div class="bottomArea hide" id="navArea">
+        <div class="hint" id="hintText">🧠 Dica: responda com atenção — depois não dá para mudar.</div>
+        <button class="nextBtn" id="nextBtn" type="button" disabled>➡️ Próxima pergunta</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal de resultado -->
+  <div class="modalOverlay" id="resultOverlay" role="dialog" aria-modal="true" aria-label="Resultado final">
+    <div class="modal">
+      <div class="modalHeader">
+        <div class="h">🏁 Resultado Final</div>
+        <div style="color:var(--muted); font-weight:850; font-size:12px;">DESAFIO DA COMUNICAÇÃO</div>
+      </div>
+
+      <div class="modalBody">
+        <div class="bigScore">
+          <div class="scoreBox">
+            <div class="k">Sua pontuação</div>
+            <div class="v" id="finalScore">0</div>
+            <div style="margin-top:4px; color:var(--muted); font-weight:800; font-size:14px;">
+              de 15 pontos
+            </div>
+          </div>
+          <div class="resultMsg">
+            <p class="m" id="finalMessage">...</p>
+            <p class="s" id="finalSub">...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modalActions">
+        <button class="nextBtn ghost" id="closeBtn" type="button" style="display:none;">Fechar</button>
+        <button class="nextBtn primary" id="playAgainBtn" type="button">🔁 Jogar novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const questions = [
+        {
+          statement: "Uma mensagem escrita é sempre mais clara do que uma explicação oral.",
+          answer: "FALSO",
+          justification: "A clareza depende da organização, da linguagem e do contexto. Tanto a fala quanto a escrita podem ser claras ou confusas."
+        },
+        {
+          statement: "A linguagem informal nunca deve ser utilizada no ambiente profissional.",
+          answer: "FALSO",
+          justification: "A linguagem informal pode ser adequada em conversas cotidianas. O importante é considerar o contexto, o interlocutor e a situação."
+        },
+        {
+          statement: "Na comunicação oral, a entonação pode alterar o sentido de uma frase.",
+          answer: "VERDADEIRO",
+          justification: "O tom de voz, a ênfase e a entonação ajudam a expressar intenções e emoções e podem mudar a interpretação de uma fala."
+        },
+        {
+          statement: "Uma mensagem curta é necessariamente uma mensagem objetiva.",
+          answer: "FALSO",
+          justification: "Uma mensagem curta pode omitir informações essenciais. Ser objetivo é transmitir o necessário com clareza, não apenas usar poucas palavras."
+        },
+        {
+          statement: "A escrita permite revisar e organizar as informações antes de transmiti-las.",
+          answer: "VERDADEIRO",
+          justification: "Uma vantagem da comunicação escrita é a possibilidade de planejar, revisar e corrigir o conteúdo antes de enviá-lo."
+        },
+        {
+          statement: "A comunicação oral permite esclarecer dúvidas imediatamente durante uma conversa.",
+          answer: "VERDADEIRO",
+          justification: "A interação presencial ou por chamada permite que as pessoas façam perguntas e esclareçam pontos em tempo real."
+        },
+        {
+          statement: "Utilizar palavras difíceis torna uma mensagem automaticamente mais profissional.",
+          answer: "FALSO",
+          justification: "O profissionalismo está ligado à clareza, à adequação e ao respeito. Palavras complexas sem necessidade podem dificultar a compreensão."
+        },
+        {
+          statement: "O mesmo conteúdo pode precisar de adaptações dependendo do meio de comunicação utilizado.",
+          answer: "VERDADEIRO",
+          justification: "Uma informação pode exigir estrutura e linguagem diferentes em uma conversa, em um e-mail, em um relatório ou em uma mensagem instantânea."
+        },
+        {
+          statement: "Na comunicação escrita, o leitor sempre consegue perceber a intenção e o tom de quem escreveu.",
+          answer: "FALSO",
+          justification: "Na escrita, não há necessariamente entonação ou expressão facial. Por isso, uma frase pode ser interpretada de maneira diferente da intenção de quem escreveu."
+        },
+        {
+          statement: "Gírias e abreviações usadas entre amigos são sempre adequadas em um e-mail para um cliente.",
+          answer: "FALSO",
+          justification: "A escolha das palavras deve considerar o destinatário e o objetivo. Em um e-mail profissional, é importante priorizar clareza e adequação."
+        },
+        {
+          statement: "Ao dar uma orientação oral, organizar as informações em uma sequência lógica facilita a compreensão.",
+          answer: "VERDADEIRO",
+          justification: "Apresentar primeiro o contexto e depois as etapas, os responsáveis e os prazos ajuda o ouvinte a acompanhar a orientação."
+        },
+        {
+          statement: "Se uma pessoa não entendeu uma mensagem escrita, a melhor solução é repetir exatamente o mesmo texto.",
+          answer: "FALSO",
+          justification: "É melhor reformular a mensagem, acrescentar contexto ou escolher outro canal, verificando se a informação ficou clara."
+        },
+        {
+          statement: "A pontuação pode influenciar a interpretação de uma mensagem escrita.",
+          answer: "VERDADEIRO",
+          justification: "Vírgulas, pontos de interrogação e exclamação, entre outros sinais, ajudam a organizar o texto e podem alterar seu sentido."
+        },
+        {
+          statement: "Em uma conversa profissional, ouvir com atenção é tão importante quanto conseguir se expressar bem.",
+          answer: "VERDADEIRO",
+          justification: "A comunicação é uma via de mão dupla. Escutar, confirmar o entendimento e considerar a fala do outro evita ruídos."
+        },
+        {
+          statement: "Escolher entre falar ou escrever depende apenas da preferência de quem transmite a mensagem.",
+          answer: "FALSO",
+          justification: "A escolha deve considerar urgência, complexidade, necessidade de registro, público e possibilidade de interação."
+        }
+      ];
+
+      const total = questions.length;
+
+      // UI
+      const startScreen = document.getElementById('startScreen');
+      const gameScreen  = document.getElementById('gameScreen');
+      const navArea     = document.getElementById('navArea');
+
+      const startBtn = document.getElementById('startBtn');
+      const nextBtn  = document.getElementById('nextBtn');
+
+      const trueBtn  = document.getElementById('trueBtn');
+      const falseBtn = document.getElementById('falseBtn');
+
+      const questionText = document.getElementById('questionText');
+      const feedbackBox  = document.getElementById('feedbackBox');
+
+      const qIndex = document.getElementById('qIndex');
+      const qIndexLabel = document.getElementById('qIndexLabel');
+
+      const hudProgress = document.getElementById('hudProgress');
+      const hudScore    = document.getElementById('hudScore');
+
+      const progressBar  = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      // Result modal
+      const resultOverlay = document.getElementById('resultOverlay');
+      const finalScore = document.getElementById('finalScore');
+      const finalMessage = document.getElementById('finalMessage');
+      const finalSub = document.getElementById('finalSub');
+      const playAgainBtn = document.getElementById('playAgainBtn');
+
+      let currentIndex = 0;
+      let score = 0;
+
+      // Controle de travamento: não permitir alterar após escolher
+      let answered = false;
+      let selected = null; // "VERDADEIRO"/"FALSO"
+
+      function updateHUD(){
+        const answeredCount = currentIndex; // perguntas já respondidas
+        hudProgress.textContent = `${answeredCount}/${total}`;
+        hudScore.textContent = `${score}`;
+
+        const percent = Math.round((answeredCount / total) * 100);
+        progressText.textContent = `${percent}%`;
+        progressBar.style.width = `${(answeredCount / total) * 100}%`;
+      }
+
+      function setFeedback({correct, userChoice, correctAnswer, justification}){
+        feedbackBox.classList.remove('good','bad','show');
+        feedbackBox.innerHTML = '';
+
+        const icon = correct ? '✅' : '❌';
+        const badgeBgClass = correct ? 'good' : 'bad';
+
+        feedbackBox.classList.add('show', correct ? 'good' : 'bad');
+
+        const badgeText = correct ? 'ACERTO' : 'ERRO';
+        feedbackBox.innerHTML = `
+          <div class="head">
+            <div class="badge" aria-hidden="true">${icon}</div>
+            <div class="txt">${badgeText}</div>
+          </div>
+          <p>${justification}</p>
+          <div class="correctLine">Resposta correta: <span>${correctAnswer}</span></div>
+          <div class="correctLine" style="font-weight:850; color: var(--muted); margin-top:6px;">
+            Sua resposta: <span style="color:${correct ? 'var(--good)' : 'var(--bad)'};">${userChoice}</span>
+          </div>
+        `;
+      }
+
+      function lockAnswer(){
+        answered = true;
+        nextBtn.disabled = false;
+        trueBtn.disabled = true;
+        falseBtn.disabled = true;
+      }
+
+      function unlockForNext(){
+        answered = false;
+        selected = null;
+        nextBtn.disabled = true;
+        trueBtn.disabled = false;
+        falseBtn.disabled = false;
+        feedbackBox.classList.remove('show','good','bad');
+        feedbackBox.innerHTML = '';
+      }
+
+      function renderQuestion(){
+        const q = questions[currentIndex];
+        qIndex.textContent = `${currentIndex + 1} / ${total}`;
+        questionText.textContent = q.statement;
+
+        // estado inicial para a pergunta
+        unlockForNext();
+        updateHUD();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function grade(choice){
+        if (answered) return; // trava após escolha
+
+        const q = questions[currentIndex];
+        selected = choice;
+
+        const correct = (choice === q.answer);
+        if (correct) score += 1;
+
+        setFeedback({
+          correct,
+          userChoice: choice,
+          correctAnswer: q.answer,
+          justification: q.justification
+        });
+
+        lockAnswer();
+        updateHUD();
+      }
+
+      function finishGame(){
+        const percent = Math.round((score / total) * 100);
+
+        let msg = "";
+        let sub = "";
+
+        if (score === total) {
+          msg = "Nível: Excelente! 🎉 Você acertou tudo!";
+          sub = `Você fez ${score} de ${total} (${percent}%). Domínio completo sobre fala x escrita.`;
+        } else if (score >= 12) {
+          msg = "Nível: Muito bom! ⭐ Quase perfeito!";
+          sub = `Você fez ${score} de ${total} (${percent}%). Revisar as que errou vai te deixar ainda melhor.`;
+        } else if (score >= 8) {
+          msg = "Nível: Bom progresso 💪";
+          sub = `Você fez ${score} de ${total} (${percent}%). Está no caminho — cuide das diferenças entre os meios.`;
+        } else if (score >= 4) {
+          msg = "Nível: Começando a entender 🧠";
+          sub = `Você fez ${score} de ${total} (${percent}%). Vale reler as justificativas para consolidar.`;
+        } else {
+          msg = "Nível: Precisa de prática 📚";
+          sub = `Você fez ${score} de ${total} (${percent}%). Volte e tente de novo para fixar as ideias.`;
+        }
+
+        finalScore.textContent = `${score}`;
+        finalMessage.textContent = msg;
+        finalSub.textContent = sub;
+
+        resultOverlay.classList.add('show');
+      }
+
+      function startGame(){
+        // reset
+        currentIndex = 0;
+        score = 0;
+        answered = false;
+        selected = null;
+
+        resultOverlay.classList.remove('show');
+
+        startScreen.classList.add('hide');
+        gameScreen.classList.remove('hide');
+        navArea.classList.remove('hide');
+
+        renderQuestion();
+      }
+
+      function nextQuestion(){
+        if (!answered) return;
+
+        currentIndex += 1;
+        if (currentIndex >= total){
+          updateHUD();
+          finishGame();
+          // manter último feedback visível
+          return;
+        }
+        renderQuestion();
+      }
+
+      // Events
+      startBtn.addEventListener('click', startGame);
+      playAgainBtn.addEventListener('click', startGame);
+
+      trueBtn.addEventListener('click', () => grade("VERDADEIRO"));
+      falseBtn.addEventListener('click', () => grade("FALSO"));
+      nextBtn.addEventListener('click', nextQuestion);
+
+      // Atualiza HUD no carregamento
+      updateHUD();
+    })();
+  </script>
+</body>
+</html>
